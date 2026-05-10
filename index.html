@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KHP Hosting | استضافة الفيديوهات اللانهائية</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #020617; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
+        .barca-accent { background: linear-gradient(135deg, #a50044 0%, #004d98 100%); }
+        .glass-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="min-h-screen pb-10">
+
+    <nav class="barca-accent p-6 shadow-xl border-b border-yellow-500/20">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-3xl font-black italic tracking-tight">KHP <span class="text-yellow-400 underline">CLOUD</span></h1>
+            <div class="text-sm font-bold bg-black/20 px-3 py-1 rounded-full border border-white/10">Unlimited Upload</div>
+        </div>
+    </nav>
+
+    <main class="container mx-auto mt-12 px-4 max-w-4xl">
+        
+        <div class="glass-card rounded-[2.5rem] p-10 shadow-2xl overflow-hidden relative">
+            <div class="text-center mb-10">
+                <h2 class="text-4xl font-extrabold mb-4">ارفع أي فيديو.. بأي حجم!</h2>
+                <p class="text-slate-400 text-lg">منصة خالد وليد لاستضافة الفيديوهات وتوليد أكواد التضمين (Embed) مجاناً.</p>
+            </div>
+
+            <div id="dropZone" class="relative border-4 border-dashed border-slate-700 rounded-[2rem] p-16 text-center hover:border-blue-500 hover:bg-blue-500/5 transition-all group cursor-pointer">
+                <input type="file" id="videoInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="video/*">
+                <div class="space-y-6">
+                    <i class="fas fa-file-video text-7xl text-slate-600 group-hover:text-blue-400 transition-colors"></i>
+                    <div>
+                        <p class="text-2xl font-bold text-slate-200">اسحب الفيديو هنا للبدء</p>
+                        <p class="text-slate-500 mt-2">لا توجد قيود على الحجم أو المدة</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loader" class="hidden mt-10 space-y-4">
+                <div class="flex justify-between items-center">
+                    <span id="msg" class="text-blue-400 font-medium">جاري معالجة الملف...</span>
+                    <span id="percent" class="font-bold text-yellow-400">0%</span>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-5 p-1 border border-slate-700">
+                    <div id="bar" class="barca-accent h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div id="result" class="hidden mt-10 animate-bounce-in">
+                <div class="p-6 bg-green-500/10 border border-green-500/30 rounded-3xl">
+                    <div class="flex items-center gap-3 text-green-400 font-bold mb-4 text-lg">
+                        <i class="fas fa-star"></i>
+                        <span>تم الرفع! انسخ كود التضمين لموقعك:</span>
+                    </div>
+                    <div class="relative bg-black/60 p-5 rounded-2xl border border-slate-700">
+                        <code id="codeText" class="text-blue-300 text-sm break-all font-mono"></code>
+                        <button onclick="copyEmbed()" class="mt-4 w-full bg-yellow-400 text-black py-3 rounded-xl font-black hover:bg-yellow-300 transition-colors">
+                            نسخ الكود الآن
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <button id="upBtn" class="mt-10 w-full barca-accent py-5 rounded-3xl text-2xl font-black shadow-2xl hover:brightness-110 active:scale-95 transition-all disabled:opacity-30">
+                بدء الرفع للسيرفر
+            </button>
+        </div>
+
+        <div class="mt-8 text-center text-slate-500 text-sm">
+            تم التطوير بواسطة <span class="text-slate-300">خالد وليد</span> &copy; 2026
+        </div>
+    </main>
+
+    <script>
+        const API = "https://khalidwalidabdelnaseer22-khp-backend.hf.space/upload";
+        
+        const input = document.getElementById('videoInput');
+        const btn = document.getElementById('upBtn');
+        const loader = document.getElementById('loader');
+        const bar = document.getElementById('bar');
+        const percent = document.getElementById('percent');
+        const result = document.getElementById('result');
+        const codeText = document.getElementById('codeText');
+
+        btn.onclick = async () => {
+            if (!input.files[0]) return alert("فين الفيديو يا خالد؟");
+            
+            btn.disabled = true;
+            result.classList.add('hidden');
+            loader.classList.remove('hidden');
+            
+            let p = 0;
+            const timer = setInterval(() => {
+                if (p < 95) { p += 1; update(p); }
+            }, 800);
+
+            const fd = new FormData();
+            fd.append('file', input.files[0]);
+
+            try {
+                const res = await fetch(API, { method: 'POST', body: fd });
+                const data = await res.json();
+                clearInterval(timer);
+
+                if (res.ok) {
+                    update(100);
+                    const embed = `<iframe frameborder="0" width="100%" height="400" src="${data.embed_url}" allowfullscreen allow="autoplay"></iframe>`;
+                    codeText.innerText = embed;
+                    result.classList.remove('hidden');
+                    document.getElementById('msg').innerText = "✅ اكتمل الرفع بنجاح!";
+                } else { throw new Error(data.detail); }
+            } catch (e) {
+                clearInterval(timer);
+                alert("خطأ: " + e.message);
+                loader.classList.add('hidden');
+            } finally { btn.disabled = false; }
+        };
+
+        function update(v) {
+            bar.style.width = v + "%";
+            percent.innerText = v + "%";
+        }
+
+        function copyEmbed() {
+            navigator.clipboard.writeText(codeText.innerText);
+            alert("تم نسخ كود التضمين بنجاح!");
+        }
+    </script>
+</body>
+</html>
