@@ -3,132 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KHP Hosting | استضافة الفيديوهات اللانهائية</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>KHP Video Cloud - استضافة خالد وليد</title>
     <style>
-        body { background-color: #020617; color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
-        .barca-accent { background: linear-gradient(135deg, #a50044 0%, #004d98 100%); }
-        .glass-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        /* إعدادات الألوان البرشلونية (Blaugrana) */
+        :root {
+            --barca-red: #a50044;
+            --barca-blue: #004d98;
+            --barca-gold: #edbb00;
+            --dark-bg: #050a14;
+            --card-bg: #0f172a;
+        }
+
+        body {
+            background-color: var(--dark-bg);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding-bottom: 50px;
+            text-align: center;
+        }
+
+        /* الهيدر */
+        header {
+            background: linear-gradient(90deg, var(--barca-red), var(--barca-blue));
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            border-bottom: 3px solid var(--barca-gold);
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+
+        /* كارت الرفع */
+        .upload-card {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        h1 { margin: 0; font-size: 28px; font-style: italic; }
+        h2 { color: white; margin-bottom: 10px; }
+        p { color: #94a3b8; }
+
+        /* منطقة اختيار الملف */
+        .drop-zone {
+            border: 3px dashed #334155;
+            border-radius: 15px;
+            padding: 50px;
+            margin: 30px 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .drop-zone:hover {
+            border-color: var(--barca-blue);
+            background-color: rgba(0, 77, 152, 0.1);
+        }
+
+        input[type="file"] { display: none; }
+
+        /* زر الرفع */
+        .btn-upload {
+            background: linear-gradient(var(--barca-red), var(--barca-blue));
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+
+        .btn-upload:active { transform: scale(0.98); }
+        .btn-upload:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        /* شريط التحميل */
+        .progress-container {
+            display: none;
+            margin-top: 25px;
+        }
+
+        .progress-bar {
+            background-color: #1e293b;
+            border-radius: 10px;
+            height: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            background: var(--barca-gold);
+            height: 100%;
+            width: 0%;
+            transition: width 0.4s;
+        }
+
+        /* منطقة كود الـ Embed */
+        #resultArea {
+            display: none;
+            margin-top: 30px;
+            background: rgba(0,0,0,0.4);
+            padding: 20px;
+            border-radius: 15px;
+            border-right: 5px solid var(--barca-gold);
+            text-align: right;
+        }
+
+        textarea {
+            width: 100%;
+            background: #000;
+            color: #4ade80;
+            border: 1px solid #334155;
+            padding: 10px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+            resize: none;
+        }
+
+        .copy-btn {
+            background-color: var(--barca-gold);
+            color: black;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
     </style>
 </head>
-<body class="min-h-screen pb-10">
+<body>
 
-    <nav class="barca-accent p-6 shadow-xl border-b border-yellow-500/20">
-        <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-3xl font-black italic tracking-tight">KHP <span class="text-yellow-400 underline">CLOUD</span></h1>
-            <div class="text-sm font-bold bg-black/20 px-3 py-1 rounded-full border border-white/10">Unlimited Upload</div>
+    <header>
+        <h1>KHP <span style="color: var(--barca-gold);">VIDEO</span> CLOUD</h1>
+    </header>
+
+    <div class="container">
+        <div class="upload-card">
+            <h2>استضافة فيديوهات غير محدودة</h2>
+            <p>ارفع فيديوهاتك واحصل على كود التضمين لموقعك فوراً</p>
+
+            <label class="drop-zone" id="dropLabel">
+                <input type="file" id="videoInput" accept="video/*">
+                <div style="font-size: 40px; margin-bottom: 10px;">🎥</div>
+                <div id="fileName">اضغط هنا لاختيار الفيديو</div>
+            </label>
+
+            <button id="uploadBtn" class="btn-upload">بدء الرفع الآن</button>
+
+            <div class="progress-container" id="progressArea">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div id="statusText">جاري الرفع... 0%</div>
+            </div>
+
+            <div id="resultArea">
+                <strong style="color: var(--barca-gold);">✅ تم الرفع بنجاح!</strong>
+                <p style="font-size: 14px; margin: 5px 0;">كود التضمين (Embed Code):</p>
+                <textarea id="embedCode" rows="4" readonly></textarea>
+                <button class="copy-btn" id="copyBtn">نسخ الكود</button>
+            </div>
         </div>
-    </nav>
-
-    <main class="container mx-auto mt-12 px-4 max-w-4xl">
-        
-        <div class="glass-card rounded-[2.5rem] p-10 shadow-2xl overflow-hidden relative">
-            <div class="text-center mb-10">
-                <h2 class="text-4xl font-extrabold mb-4">ارفع أي فيديو.. بأي حجم!</h2>
-                <p class="text-slate-400 text-lg">منصة خالد وليد لاستضافة الفيديوهات وتوليد أكواد التضمين (Embed) مجاناً.</p>
-            </div>
-
-            <div id="dropZone" class="relative border-4 border-dashed border-slate-700 rounded-[2rem] p-16 text-center hover:border-blue-500 hover:bg-blue-500/5 transition-all group cursor-pointer">
-                <input type="file" id="videoInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="video/*">
-                <div class="space-y-6">
-                    <i class="fas fa-file-video text-7xl text-slate-600 group-hover:text-blue-400 transition-colors"></i>
-                    <div>
-                        <p class="text-2xl font-bold text-slate-200">اسحب الفيديو هنا للبدء</p>
-                        <p class="text-slate-500 mt-2">لا توجد قيود على الحجم أو المدة</p>
-                    </div>
-                </div>
-            </div>
-
-            <div id="loader" class="hidden mt-10 space-y-4">
-                <div class="flex justify-between items-center">
-                    <span id="msg" class="text-blue-400 font-medium">جاري معالجة الملف...</span>
-                    <span id="percent" class="font-bold text-yellow-400">0%</span>
-                </div>
-                <div class="w-full bg-slate-800 rounded-full h-5 p-1 border border-slate-700">
-                    <div id="bar" class="barca-accent h-full rounded-full transition-all duration-300" style="width: 0%"></div>
-                </div>
-            </div>
-
-            <div id="result" class="hidden mt-10 animate-bounce-in">
-                <div class="p-6 bg-green-500/10 border border-green-500/30 rounded-3xl">
-                    <div class="flex items-center gap-3 text-green-400 font-bold mb-4 text-lg">
-                        <i class="fas fa-star"></i>
-                        <span>تم الرفع! انسخ كود التضمين لموقعك:</span>
-                    </div>
-                    <div class="relative bg-black/60 p-5 rounded-2xl border border-slate-700">
-                        <code id="codeText" class="text-blue-300 text-sm break-all font-mono"></code>
-                        <button onclick="copyEmbed()" class="mt-4 w-full bg-yellow-400 text-black py-3 rounded-xl font-black hover:bg-yellow-300 transition-colors">
-                            نسخ الكود الآن
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <button id="upBtn" class="mt-10 w-full barca-accent py-5 rounded-3xl text-2xl font-black shadow-2xl hover:brightness-110 active:scale-95 transition-all disabled:opacity-30">
-                بدء الرفع للسيرفر
-            </button>
-        </div>
-
-        <div class="mt-8 text-center text-slate-500 text-sm">
-            تم التطوير بواسطة <span class="text-slate-300">خالد وليد</span> &copy; 2026
-        </div>
-    </main>
+    </div>
 
     <script>
-        const API = "https://khalidwalidabdelnaseer22-khp-backend.hf.space/upload";
-        
-        const input = document.getElementById('videoInput');
-        const btn = document.getElementById('upBtn');
-        const loader = document.getElementById('loader');
-        const bar = document.getElementById('bar');
-        const percent = document.getElementById('percent');
-        const result = document.getElementById('result');
-        const codeText = document.getElementById('codeText');
+        // الرابط الخاص بسيرفرك على Hugging Face
+        const API_URL = "https://khalidwalidabdelnaseer22-khp-backend.hf.space/upload";
 
-        btn.onclick = async () => {
-            if (!input.files[0]) return alert("فين الفيديو يا خالد؟");
-            
-            btn.disabled = true;
-            result.classList.add('hidden');
-            loader.classList.remove('hidden');
-            
-            let p = 0;
-            const timer = setInterval(() => {
-                if (p < 95) { p += 1; update(p); }
-            }, 800);
+        const videoInput = document.getElementById('videoInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const fileNameDisp = document.getElementById('fileName');
+        const progressArea = document.getElementById('progressArea');
+        const progressFill = document.getElementById('progressFill');
+        const statusText = document.getElementById('statusText');
+        const resultArea = document.getElementById('resultArea');
+        const embedCode = document.getElementById('embedCode');
 
-            const fd = new FormData();
-            fd.append('file', input.files[0]);
-
-            try {
-                const res = await fetch(API, { method: 'POST', body: fd });
-                const data = await res.json();
-                clearInterval(timer);
-
-                if (res.ok) {
-                    update(100);
-                    const embed = `<iframe frameborder="0" width="100%" height="400" src="${data.embed_url}" allowfullscreen allow="autoplay"></iframe>`;
-                    codeText.innerText = embed;
-                    result.classList.remove('hidden');
-                    document.getElementById('msg').innerText = "✅ اكتمل الرفع بنجاح!";
-                } else { throw new Error(data.detail); }
-            } catch (e) {
-                clearInterval(timer);
-                alert("خطأ: " + e.message);
-                loader.classList.add('hidden');
-            } finally { btn.disabled = false; }
+        // إظهار اسم الملف المختار
+        videoInput.onchange = () => {
+            if (videoInput.files[0]) {
+                fileNameDisp.innerText = "الملف المختار: " + videoInput.files[0].name;
+                fileNameDisp.style.color = "#edbb00";
+            }
         };
 
-        function update(v) {
-            bar.style.width = v + "%";
-            percent.innerText = v + "%";
-        }
+        uploadBtn.onclick = async () => {
+            const file = videoInput.files[0];
+            if (!file) {
+                alert("يا خالد، اختار فيديو الأول!");
+                return;
+            }
 
-        function copyEmbed() {
-            navigator.clipboard.writeText(codeText.innerText);
-            alert("تم نسخ كود التضمين بنجاح!");
-        }
+            // تجهيز الواجهة
+            uploadBtn.disabled = true;
+            progressArea.style.display = 'block';
+            resultArea.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            // محاكاة التحميل
+            let progress = 0;
+            const timer = setInterval(() => {
+                if (progress < 95) {
+                    progress += 1;
+                    progressFill.style.width = progress + "%";
+                    statusText.innerText = `جاري المعالجة والرفع... ${progress}%`;
+                }
+            }, 800);
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                clearInterval(timer);
+
+                if (response.ok) {
+                    progressFill.style.width = "100%";
+                    statusText.innerText = "تم الرفع بنجاح!";
+                    
+                    // توليد كود الـ Embed
+                    const code = `<iframe frameborder="0" width="100%" height="400" src="https://www.dailymotion.com/embed/video/${data.video_id}" allowfullscreen allow="autoplay"></iframe>`;
+                    embedCode.value = code;
+                    resultArea.style.display = 'block';
+                } else {
+                    throw new Error(data.detail || "خطأ في السيرفر");
+                }
+            } catch (err) {
+                clearInterval(timer);
+                alert("حدث خطأ: " + err.message);
+                progressArea.style.display = 'none';
+            } finally {
+                uploadBtn.disabled = false;
+            }
+        };
+
+        // وظيفة نسخ الكود
+        document.getElementById('copyBtn').onclick = () => {
+            embedCode.select();
+            document.execCommand('copy');
+            alert("تم نسخ الكود! ضعه في أي مكان بموقعك.");
+        };
     </script>
+
 </body>
 </html>
